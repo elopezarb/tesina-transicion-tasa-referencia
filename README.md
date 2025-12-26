@@ -27,3 +27,9 @@ The code and materials included in this repository are provided uniquely for aca
 They are intended to support the analysis presented in the undergraduate thesis and do not represent production-ready systems, trading strategies, or financial advice.
 Any datasets, parameters, or models shown here are simplified and should not be used for real-world trading, investment decisions, or commercial applications.
 
+## Contacto
+
+**Esteban López Araiza Bravo**  
+📧 Email: estebanlab@hotmail.com  
+🔗 LinkedIn: [https://www.linkedin.com/in/esteban-lópez-araiza-bravo](https://www.linkedin.com/in/esteban-l%C3%B3pez-araiza-bravo-b21085188/)
+
