@@ -27,6 +27,10 @@ The code and materials included in this repository are provided uniquely for aca
 They are intended to support the analysis presented in the undergraduate thesis and do not represent production-ready systems, trading strategies, or financial advice.
 Any datasets, parameters, or models shown here are simplified and should not be used for real-world trading, investment decisions, or commercial applications.
 
+### Licencia
+
+Este proyecto se distribuye bajo la licencia **Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 (CC BY-NC-ND 4.0)**.
+
 ## Contacto
 
 **Esteban López Araiza Bravo**  
