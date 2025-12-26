@@ -204,17 +204,18 @@ def TIIE28Helpers(tasas, tenors, curva_descuento):
 
 # %%
 # Definición de tasas de futuros
-precio_fut_feb25 = 100-9.655
-precio_fut_mar25 = 100-9.495
+tasa_fut_feb25 = 9.655
+tasa_fut_mar25 = 9.495
 
 # Tenors de futuros
 tenors_futuros = [
     'Feb2025', # Febrero 2025
     'Mar2025'  # Marzo 2025
 ]
-precios_fut = [
-    precio_fut_feb25, # Tasa de futuro Febrero 2025   
-    precio_fut_mar25  # Tasa de futuro Marzo 2025
+
+tasas_fut = [
+    tasa_fut_feb25, # Tasa de futuro Febrero 2025   
+    tasa_fut_mar25  # Tasa de futuro Marzo 2025
 ]
 
 # Definición de tasas de swaps
@@ -432,7 +433,7 @@ def FTIIEFutureshelpers(tasas, tenors, fechas_banxico, tasas_banxico):
     # Para cada tasa, tenor y mes se crea un helper de futuro
     for r, t in zip(tasas, tenors):
 
-        tasa_ql = ql.QuoteHandle(ql.SimpleQuote(r)) # Objeto tasa de QuantLib
+        tasa_ql = ql.QuoteHandle(ql.SimpleQuote(100-r)) # Objeto precio de QuantLib 100-tasa
         mes =  dic_meses[t[:3]] # Mes del futuro
         anio =  int(t[3:]) # año del futuro
          
@@ -1014,8 +1015,6 @@ def genSOFR(sofr_futures, tenors_fut_sofr, sofr_swaps, tenors_sofr, depo, tenor_
     crvSOFR.enableExtrapolation() # Habilita la extrapolación de la curva
 
     return crvSOFR
-
-ql.Settings.instance().evaluationDate = ql.Date(19,2,2025)
 # Definición de la curva de descuento de SOFR
 crvSOFR = genSOFR(sofr_futures, tenors_fut_sofr, sofr_swaps, tenors_sofr, depo, tenor_depo)
 
@@ -1138,8 +1137,10 @@ def genTIIE28(tasas_tiie28, tenors_tiie28, curva_descuento):
     return crvTIIE28
 
 
-def genFTIIE(tasas_fut, tenors_fut, tasas_ftiie, tenors_ftiie,
-             curva_descuento, fechas_banxico, tasas_banxico):
+def genFTIIE(tasas_ftiie, tenors_ftiie, curva_descuento,
+             tasas_fut = [], tenors_fut = [],
+             fechas_banxico = [],  # Fechas de Banxico para los futuros FTIIE
+             tasas_banxico = []): # Tasas de Banxico para los futuros FTII
     """
     Crea la curva de tasas FTIIE.
 
@@ -1165,11 +1166,14 @@ def genFTIIE(tasas_fut, tenors_fut, tasas_ftiie, tenors_ftiie,
     ql.PiecewiseLogLinearDiscount
         Curva de tasas FTIIE.
     """
-
-    # Definición de los helpers para FTIIE
-    helpers_ftiie = FTIIEHelpers(tasas_fut, tenors_fut,
-                                 tasas_ftiie, tenors_ftiie,
-                                 curva_descuento, fechas_banxico, tasas_banxico)
+    # Cuando no hay futuros, se usan solo los swaps FTIIE
+    if len(tasas_fut) == 0 or len(tenors_fut) == 0:
+        helpers_ftiie = FTIIESwapHelpers(tasas_ftiie, tenors_ftiie, curva_descuento) # Si no hay futuros, solo se usan los swaps FTIIE
+    else:
+        # Definición de los helpers para FTIIE
+        helpers_ftiie = FTIIEHelpers(tasas_fut, tenors_fut,
+                                    tasas_ftiie, tenors_ftiie,
+                                    curva_descuento, fechas_banxico, tasas_banxico)
 
     # Definición de la curva de tasas FTIIE
     crvFTIIE = ql.PiecewiseNaturalLogCubicDiscount(
@@ -1190,9 +1194,10 @@ df_nodos
 
 # %%
 # Ahora lo hacemos para FTIIE
-crvFTIIE = genFTIIE(precios_fut, tenors_futuros,
-                    tasas_ftiie, tenors_ftiie, crvDISCTIIE,
-                    fechas_banxico, tasas_banxico) # Curva de tasas FTIIE
+crvFTIIE = genFTIIE(
+    tasas_ftiie, tenors_ftiie, crvDISCTIIE, 
+    tasas_fut, tenors_futuros,
+    fechas_banxico, tasas_banxico) # Curva de tasas FTIIE
 # DataFrame con los nodos de la curva de descuento de FTIIE
 df_nodos = pd.DataFrame(crvFTIIE.nodes()).rename(columns={0: 'Fecha', 1: 'Factor de Descuento'}) # DataFrame con los nodos de la curva de descuento de SOFR
 df_nodos
